@@ -6,8 +6,12 @@ module RequireFootprintAnalyzer
 
       process_id = fork do
         RequireSpy.spy_require(child_transport)
-
-        require(library)
+        begin
+          require(library)
+        rescue LoadError => e
+          child_transport.exit_with_error(e)
+          exit
+        end
         child_transport.done
 
         while (msg, data = child_transport.read_one_command)
@@ -31,6 +35,9 @@ module RequireFootprintAnalyzer
         elsif msg == :ready
           last_rss = rss(process_id)
           parent_transport.start
+        elsif msg == :exit
+          puts "Exiting because of exception #{payload}"
+          exit 1
         elsif msg == :done
           break
         end

@@ -21,6 +21,8 @@ module RequireFootprintAnalyzer
         [:start, nil]
       when /\Aready\z/
         [:ready, nil]
+      when /\Aexit: "([^"]+)"\z/
+        [:exit, $1]
       end
     end
 
@@ -53,6 +55,10 @@ module RequireFootprintAnalyzer
 
     def report_already_required(library)
       @write_stream.puts "arq: #{library.inspect}"
+    end
+
+    def exit_with_error(e)
+      @write_stream.puts "exit: #{e.to_s.inspect}"
     end
   end
 end
