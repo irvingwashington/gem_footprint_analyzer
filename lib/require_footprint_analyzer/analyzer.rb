@@ -1,17 +1,24 @@
 module RequireFootprintAnalyzer
   class Analyzer
-    def test_library(library)
+    def test_library(library, require_string=nil)
+      require_string ||= library
+      begin
+        gem(library)
+      rescue Gem::LoadError
+      end
       child_transport, parent_transport = init_transports
       result_hash = {}
+      GC.start
 
       process_id = fork do
         RequireSpy.spy_require(child_transport)
         begin
-          require(library)
+          require(require_string)
         rescue LoadError => e
           child_transport.exit_with_error(e)
           exit
         end
+        sleep 1
         child_transport.done
 
         while (msg, data = child_transport.read_one_command)
@@ -21,28 +28,29 @@ module RequireFootprintAnalyzer
 
       Process.detach(process_id)
 
-      last_rss = 0
+      base_rss = nil
       requires = []
 
       while (msg, payload = parent_transport.read_one_command)
         if msg == :require
           curr_rss = rss(process_id)
-          used_rss = curr_rss - last_rss
           name, time = payload
-          requires << {name: name, time: time, rss: used_rss}
+          requires << {name: name, time: Float(time), rss: curr_rss - base_rss}
         elsif msg == :already_required
-          requires << {name: name, info: 'already required before'}
         elsif msg == :ready
-          last_rss = rss(process_id)
+          unless base_rss
+            base_rss = rss(process_id)
+            requires << {base: true, rss: base_rss}
+          end
           parent_transport.start
         elsif msg == :exit
-          puts "Exiting because of exception #{payload}"
+          puts "Exiting because of exception: #{payload}"
           exit 1
         elsif msg == :done
           break
         end
       end
-      pkill(process_id)
+      parent_transport.ack
       requires
     end
 

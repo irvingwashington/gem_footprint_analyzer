@@ -18,6 +18,7 @@ module RequireFootprintAnalyzer
         t = timed_exec do
           result = regular_require(name)
         end
+
         if result
           interactor.report_require(name, t)
         else

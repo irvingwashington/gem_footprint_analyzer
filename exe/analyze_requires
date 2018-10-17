@@ -2,7 +2,15 @@
 require 'require_footprint_analyzer'
 
 if ARGV.size < 1
-  puts "#{$0} library_to_analyze [library_to_analyze2]"
+  script_name = "bundle exec #{File.basename($0)}"
+  puts "#{script_name} library_to_analyze [require]"
+  puts "Examples:"
+  puts "  #{script_name} net/http"
+  puts "  #{script_name} activesupport active_support"
+  puts "  #{script_name} typhoeus"
+  puts "  #{script_name} typhoeus typhoeus/request"
   exit 1
 end
-p RequireFootprintAnalyzer::Analyzer.new.test_library(ARGV[0])
+
+requires_list = RequireFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
+puts RequireFootprintAnalyzer::TextFormatter.new.format(requires_list)
