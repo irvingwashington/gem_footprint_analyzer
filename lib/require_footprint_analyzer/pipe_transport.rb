@@ -32,6 +32,12 @@ module RequireFootprintAnalyzer
       end
     end
 
+    def wait_for_ack
+      while (msg, data = read_one_command)
+        break if msg == :ack
+      end
+    end
+
     def ready
       @write_stream.puts 'ready'
     end

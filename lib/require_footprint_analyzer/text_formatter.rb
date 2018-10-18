@@ -1,9 +1,10 @@
 module RequireFootprintAnalyzer
   class TextFormatter
     TABULATION = '  '.freeze
+    NEWLINE = "\n".freeze
 
     def format(requires_list)
-      base_rss = nil
+      return if requires_list.size == 1
       entries_num = requires_list.size
       lines = []
       longest_name_length = requires_list.map { |el| el[:name]&.length }.compact.max
@@ -12,18 +13,15 @@ module RequireFootprintAnalyzer
       lines << dash(longest_name_length) if requires_list.size > 2
 
       requires_list.each_with_index do |entry, i|
-        last_element = (i == entries_num - 1)
+        next if i.zero?
 
-        if i.zero?
-          base_rss = entry[:rss]
-          next
-        end
+        last_element = (i == entries_num - 1)
 
         name, time, rss = entry.values_at(:name, :time, :rss)
         lines << dash(longest_name_length) if last_element
         lines << [format_name(name, longest_name_length, last_element), format_time(time), format_rss(rss)].join(' ')
       end
-      lines.join("\n")
+      lines.join(NEWLINE)
     end
 
     private

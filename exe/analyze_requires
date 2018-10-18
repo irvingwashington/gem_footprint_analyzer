@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'require_footprint_analyzer'
 
-if ARGV.size < 1
+if ARGV.size < 1 || ARGV.size > 2
   script_name = "bundle exec #{File.basename($0)}"
   puts "#{script_name} library_to_analyze [require]"
   puts "Examples:"
