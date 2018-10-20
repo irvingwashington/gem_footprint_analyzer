@@ -10,7 +10,6 @@ Gem::Specification.new do |spec|
   spec.email         = ["maciek@dubinski.net"]
 
   spec.summary       = %q{A simple tool to analyze footprint of Ruby requires.}
-  spec.description   = %q{A simple tool to analyze footprint of Ruby requires.}
   spec.homepage      = "https://github.com/irvingwashington/gem_footprint_analyzer"
   spec.license       = "MIT"
 

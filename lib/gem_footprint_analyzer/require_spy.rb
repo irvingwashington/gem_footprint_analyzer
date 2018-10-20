@@ -1,15 +1,15 @@
 module GemFootprintAnalyzer
   module RequireSpy
     def self.spy_require(interactor)
-      Kernel.alias_method :regular_require, :require
+      Kernel.send :alias_method, :regular_require, :require
 
-      Kernel.define_method :timed_exec do |&block|
+      Kernel.send :define_method, :timed_exec do |&block|
         start_time = Time.now.to_f
         block.call
         (Time.now.to_f - start_time).round(4)
       end
 
-      Kernel.define_method :require do |name|
+      Kernel.send :define_method, :require do |name|
         result = nil
 
         interactor.ready
