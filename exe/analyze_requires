@@ -1,16 +1,42 @@
 #!/usr/bin/env ruby
 require 'gem_footprint_analyzer'
+require 'optparse'
 
-if ARGV.size < 1 || ARGV.size > 2
+options = OpenStruct.new
+options.runs = 10
+options.formatter = GemFootprintAnalyzer::TextFormatter
+
+opts_parser = OptionParser.new do |opts|
   script_name = "bundle exec #{File.basename($0)}"
-  puts "#{script_name} library_to_analyze [require]"
-  puts "Examples:"
-  puts "  #{script_name} net/http"
-  puts "  #{script_name} activesupport active_support"
-  puts "  #{script_name} typhoeus"
-  puts "  #{script_name} typhoeus typhoeus/request"
+  opts.banner = "Usage: #{script_name} library_to_analyze [require]"
+
+  opts.on('-f', '--formatter FORMATTER', %w[json text], 'Format output using selected formatter') do |formatter|
+    if formatter == 'json'
+      options.formatter = GemFootprintAnalyzer::JsonFormatter
+    end
+  end
+
+  opts.on('-n', '--runs-num NUMBER', OptParse::DecimalInteger, 'Number of runs for avergae') do |runs|
+    if runs < 1
+      fail OptionParser::InvalidArgument, 'must be a number greater than 0'
+    end
+    options.runs = runs
+  end
+
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
+end
+opts_parser.parse!(ARGV)
+
+if ARGV.size < 1
+  puts opts_parser
   exit 1
 end
 
-requires_list = GemFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
-puts GemFootprintAnalyzer::TextFormatter.new.format(requires_list)
+requires_list_average = GemFootprintAnalyzer::AverageRunner.new(options.runs) do
+  GemFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
+end.run
+
+puts options.formatter.new.format(requires_list_average)

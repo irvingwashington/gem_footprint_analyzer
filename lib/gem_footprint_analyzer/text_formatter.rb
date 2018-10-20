@@ -9,7 +9,7 @@ module GemFootprintAnalyzer
       lines = []
       longest_name_length = requires_list.map { |el| el[:name]&.length }.compact.max
 
-      lines << [format_name('name', longest_name_length, false), 'time    ', 'RSS after'].join(' ')
+      lines << [format_name('name', longest_name_length, false), '  time  ', 'RSS after'].join(' ')
       lines << dash(longest_name_length) if requires_list.size > 2
 
       requires_list.each_with_index do |entry, i|
@@ -34,11 +34,13 @@ module GemFootprintAnalyzer
     end
 
     def format_time(time)
-      "%0.4fs" % time
+      value = time.is_a?(Hash) ? time[:mean] : time
+      "%4dms" % value.round
     end
 
     def format_rss(rss)
-      "%5dKB" % rss
+      value = rss.is_a?(Hash) ? rss[:mean] : rss
+      "%6dKB" % value
     end
 
     def dash(longest_name_length)

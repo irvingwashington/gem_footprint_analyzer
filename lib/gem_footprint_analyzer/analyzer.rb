@@ -39,7 +39,7 @@ module GemFootprintAnalyzer
         if msg == :require
           curr_rss = rss(process_id)
           name, time = payload
-          requires << {name: name, time: Float(time), rss: curr_rss - base_rss}
+          requires << {name: name, time: Float(time) * 1000, rss: curr_rss - base_rss}
         elsif msg == :already_required
         elsif msg == :ready
           unless base_rss
