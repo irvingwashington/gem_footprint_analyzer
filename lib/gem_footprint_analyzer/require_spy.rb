@@ -1,4 +1,4 @@
-module RequireFootprintAnalyzer
+module GemFootprintAnalyzer
   module RequireSpy
     def self.spy_require(interactor)
       Kernel.alias_method :regular_require, :require

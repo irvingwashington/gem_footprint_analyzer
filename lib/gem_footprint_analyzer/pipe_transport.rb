@@ -1,4 +1,4 @@
-module RequireFootprintAnalyzer
+module GemFootprintAnalyzer
   class PipeTransport
     def initialize(read_stream, write_stream)
       @read_stream = read_stream

@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "require_footprint_analyzer"
+require "gem_footprint_analyzer"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

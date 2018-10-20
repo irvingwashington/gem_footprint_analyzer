@@ -1,4 +1,4 @@
-# RequireFootprintAnalyzer
+# GemFootprintAnalyzer
 
 A tool for analyzing time and RSS footprint of gems or standard library requires, it's currently in a 'work in progress' state (developed on ruby-2.5.1 / macOS).
 
@@ -7,7 +7,7 @@ A tool for analyzing time and RSS footprint of gems or standard library requires
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'require_footprint_analyzer'
+gem 'gem_footprint_analyzer'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install require_footprint_analyzer
+    $ gem install gem_footprint_analyzer
 
 ## Usage
 
@@ -413,7 +413,7 @@ archfiend    0.1212s  6568KB
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/require_footprint_analyzer. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gem_footprint_analyzer. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -421,4 +421,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the RequireFootprintAnalyzer project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/require_footprint_analyzer/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the GemFootprintAnalyzer project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/gem_footprint_analyzer/blob/master/CODE_OF_CONDUCT.md).

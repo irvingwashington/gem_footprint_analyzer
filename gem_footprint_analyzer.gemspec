@@ -1,17 +1,17 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "require_footprint_analyzer/version"
+require "gem_footprint_analyzer/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "require_footprint_analyzer"
-  spec.version       = RequireFootprintAnalyzer::VERSION
+  spec.name          = "gem_footprint_analyzer"
+  spec.version       = GemFootprintAnalyzer::VERSION
   spec.authors       = ["Maciek Dubiński"]
   spec.email         = ["maciek@dubinski.net"]
 
   spec.summary       = %q{A simple tool to analyze footprint of Ruby requires.}
   spec.description   = %q{A simple tool to analyze footprint of Ruby requires.}
-  spec.homepage      = "https://github.com/irvingwashington/require_footprint_analyzer"
+  spec.homepage      = "https://github.com/irvingwashington/gem_footprint_analyzer"
   spec.license       = "MIT"
 
   # Specify which files should be added to the gem when it is released.

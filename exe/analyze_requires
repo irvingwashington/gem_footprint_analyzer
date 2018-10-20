@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'require_footprint_analyzer'
+require 'gem_footprint_analyzer'
 
 if ARGV.size < 1 || ARGV.size > 2
   script_name = "bundle exec #{File.basename($0)}"
@@ -12,5 +12,5 @@ if ARGV.size < 1 || ARGV.size > 2
   exit 1
 end
 
-requires_list = RequireFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
-puts RequireFootprintAnalyzer::TextFormatter.new.format(requires_list)
+requires_list = GemFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
+puts GemFootprintAnalyzer::TextFormatter.new.format(requires_list)

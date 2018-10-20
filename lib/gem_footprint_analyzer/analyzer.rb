@@ -1,4 +1,4 @@
-module RequireFootprintAnalyzer
+module GemFootprintAnalyzer
   class Analyzer
 
     def test_library(library, require_string=nil)
@@ -75,8 +75,8 @@ module RequireFootprintAnalyzer
       child_reader, parent_writer = IO.pipe
       parent_reader, child_writer = IO.pipe
 
-      child_transport = RequireFootprintAnalyzer::PipeTransport.new(child_reader, child_writer)
-      parent_transport = RequireFootprintAnalyzer::PipeTransport.new(parent_reader, parent_writer)
+      child_transport = GemFootprintAnalyzer::PipeTransport.new(child_reader, child_writer)
+      parent_transport = GemFootprintAnalyzer::PipeTransport.new(parent_reader, parent_writer)
 
       [child_transport, parent_transport]
     end

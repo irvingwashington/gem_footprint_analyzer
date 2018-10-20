@@ -1,4 +1,4 @@
-module RequireFootprintAnalyzer
+module GemFootprintAnalyzer
   class TextFormatter
     TABULATION = '  '.freeze
     NEWLINE = "\n".freeze
