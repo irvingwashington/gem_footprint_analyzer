@@ -37,9 +37,10 @@ module GemFootprintAnalyzer
       requires = []
       while (msg, payload = parent_transport.read_one_command)
         if msg == :require
-          curr_rss = rss(process_id)
-          name, time = payload
-          requires << {name: name, time: Float(time) * 1000, rss: curr_rss - base_rss}
+          curr_rss = rss(process_id) - base_rss
+          name, parent_name, time = payload
+
+          requires << {name: name, parent_name: parent_name, time: Float(time) * 1000, rss: curr_rss}
         elsif msg == :already_required
         elsif msg == :ready
           unless base_rss
@@ -52,6 +53,8 @@ module GemFootprintAnalyzer
           exit 1
         elsif msg == :done
           break
+        else
+          fail "Unknown message: #{msg} (#{payload.inspect})"
         end
       end
       requires

@@ -13,8 +13,8 @@ module GemFootprintAnalyzer
         [:done, nil]
       when /\Aack\z/
         [:ack, nil]
-      when /\Arq: "([^"]+)",(.+)\z/
-        [:require, [$1, $2]]
+      when /\Arq: "([^"]+)","([^"]*)",(.+)\z/
+        [:require, [$1, $2, $3]]
       when /\Aarq: "([^"]+)"\z/
         [:already_required, $1]
       when /\Astart\z/
@@ -55,8 +55,8 @@ module GemFootprintAnalyzer
       @write_stream.puts 'done'
     end
 
-    def report_require(library, duration)
-      @write_stream.puts "rq: #{library.inspect},#{duration.inspect}"
+    def report_require(library, source, duration)
+      @write_stream.puts "rq: #{library.inspect},#{source.inspect},#{duration.inspect}"
     end
 
     def report_already_required(library)
