@@ -1,52 +1,12 @@
 #!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
+
 require 'gem_footprint_analyzer'
-require 'optparse'
 
-options = {}
-options[:runs] = 10
-options[:debug] = false
-options[:formatter] = 'tree'
+cli = GemFootprintAnalyzer::CLI.new
 
-opts_parser = OptionParser.new do |opts|
-  script_name = "bundle exec #{File.basename($0)}"
-  opts.banner = "GemFootprintAnalyzer (#{GemFootprintAnalyzer::VERSION})"
-  opts.banner += "\nUsage: #{script_name} library_to_analyze [require]"
-
-  opts.on('-f', '--formatter FORMATTER', %w[json text tree], 'Format output using selected formatter (json text tree)') do |formatter|
-    options[:formatter] = formatter
-  end
-
-  opts.on('-n', '--runs-num NUMBER', OptParse::DecimalInteger, 'Number of runs for avergae') do |runs|
-    if runs < 1
-      fail OptionParser::InvalidArgument, 'must be a number greater than 0'
-    end
-    options[:runs] = runs
-  end
-
-  opts.on('-d', '--debug', 'Show debug information') do |debug|
-    opts.banner += "\n(#{File.expand_path(File.join(File.dirname(__FILE__), '..'))})" if debug
-    options[:debug] = debug
-  end
-
-  opts.on_tail('-h', '--help', 'Show this message') do
-    puts opts
-    exit
-  end
-end
-opts_parser.parse!(ARGV)
-
-if ARGV.size < 1
-  puts opts_parser
-  exit 1
-end
-
-requires_list_average = GemFootprintAnalyzer::AverageRunner.new(options[:runs]) do
-  GemFootprintAnalyzer::Analyzer.new.test_library(*ARGV)
-end.run
-
-require 'gem_footprint_analyzer/formatters/text'
-require 'gem_footprint_analyzer/formatters/tree'
-require 'gem_footprint_analyzer/formatters/json'
-
-formatter = GemFootprintAnalyzer::Formatters.const_get(options[:formatter].capitalize)
-puts formatter.new(options).format(requires_list_average)
+t1 = Time.now.to_f
+cli.run(ARGV)
+t2 = Time.now.to_f
+puts format("\nTotal runtime %0.4fs", (t2 - t1))

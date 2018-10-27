@@ -1,10 +1,14 @@
 module GemFootprintAnalyzer
   module Formatters
+    # Base class for all text formatters.
+    # Houses boilerplate and disclaimer text methods.
     class TextBase
-      def initialize(options={})
+      # @param options [Hash<Symbol>] A hash of CLI options, to be used in disclaimer text
+      def initialize(options = {})
         @options = options
       end
 
+      # Displays explanatory words for text formatter results
       def info
         lines = []
         lines << "GemFootprintAnalyzer (#{GemFootprintAnalyzer::VERSION})\n"
@@ -15,6 +19,7 @@ module GemFootprintAnalyzer
         lines.join("\n")
       end
 
+      # @return [String] Awesome text separator
       def dash(length)
         '-' * length
       end

@@ -1,15 +1,20 @@
 module GemFootprintAnalyzer
+  # A class handling sampling and calculating basic statistical values from the set of runs.
   class AverageRunner
     RUNS = 10
-    AVERAGED_FIELDS = %i[rss time]
+    AVERAGED_FIELDS = %i[rss time].freeze
 
-    def initialize(runs=RUNS, &run_block)
-      fail ArgumentError, 'runs must be > 0' if runs < 1
+    # @param runs [Integer] optional number of runs to perform
+    # @param run_block [proc] actual unit of work to be done runs times
+    def initialize(runs = RUNS, &run_block)
+      raise ArgumentError, 'runs must be > 0' unless runs > 0
 
       @run_block = run_block
       @runs = runs
     end
 
+    # @return [Array<Hash>] Array of hashes that now include average metrics in place of fields
+    #   present in {AVERAGED_FIELDS}. The rest of the columns is copied from the first sample.
     def run
       results = []
       @runs.times do
@@ -26,10 +31,7 @@ module GemFootprintAnalyzer
 
     # Take corresponding results array values and compare them
     def calculate_averages(results)
-      average_results = []
-      first_run = results[0]
-
-      first_run.size.times do |require_number|
+      Array.new(results.first.size) do |require_number|
         samples = results.map { |r| r[require_number] }
         first_sample = samples.first
 
@@ -39,9 +41,8 @@ module GemFootprintAnalyzer
 
           average[field] = calculate_average(samples.map { |s| s[field] })
         end
-        average_results << average
+        average
       end
-      average_results
     end
 
     def calculate_average(values)
@@ -49,7 +50,7 @@ module GemFootprintAnalyzer
       sum = values.sum.to_f
       mean = sum / num
 
-      stddev = Math.sqrt(values.sum { |v| (v - mean) ** 2 } / num)
+      stddev = Math.sqrt(values.sum { |v| (v - mean)**2 } / num)
       {mean: mean, sttdev: stddev}
     end
 

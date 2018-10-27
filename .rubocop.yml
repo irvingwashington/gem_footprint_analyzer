@@ -1,0 +1,15 @@
+AllCops:
+  Include:
+    - 'lib/gem_footprint_analyzer/**/*.rb'
+    - 'exe/*'
+    - 'spec/**/*'
+  TargetRubyVersion: 2.2
+
+Metrics/LineLength:
+  Max: 100
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
