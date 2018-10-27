@@ -17,6 +17,7 @@ module GemFootprintAnalyzer
       child_transport, parent_transport = init_transports
 
       process_id = fork_and_require(require_string || library, child_transport)
+      fail 'Unable to fork' unless process_id
       detach_process(process_id)
       requires = collect_requires(parent_transport, process_id)
 
@@ -41,8 +42,6 @@ module GemFootprintAnalyzer
 
     def detach_process(pid)
       Process.detach(pid)
-      at_exit { Process.kill('TERM', pid) }
-      pid
     end
 
     def collect_requires(transport, process_id)
@@ -90,6 +89,8 @@ module GemFootprintAnalyzer
     end
 
     def try_activate_gem(library)
+      return unless Kernel.respond_to?(:gem)
+
       gem(library)
     rescue Gem::LoadError
       nil

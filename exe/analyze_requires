@@ -1,6 +1,7 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby --disable=did_you_mean --disable=gem --disable=rubyopt
 
 $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
+$LOAD_PATH.unshift('./lib') if Dir.exist?('lib')
 
 require 'gem_footprint_analyzer'
 
