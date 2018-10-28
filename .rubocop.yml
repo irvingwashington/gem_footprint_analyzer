@@ -13,3 +13,6 @@ Style/RegexpLiteral:
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
+
+Style/SignalException:
+  EnforcedStyle: semantic

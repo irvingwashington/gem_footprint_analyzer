@@ -18,6 +18,7 @@ module GemFootprintAnalyzer
 
       process_id = fork_and_require(require_string || library, child_transport)
       fail 'Unable to fork' unless process_id
+
       detach_process(process_id)
       requires = collect_requires(parent_transport, process_id)
 

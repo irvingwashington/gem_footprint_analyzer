@@ -61,7 +61,7 @@ module GemFootprintAnalyzer
         end
 
         opts.on('-n', '--runs-num NUMBER', OptParse::DecimalInteger, 'Number of runs') do |runs|
-          raise OptionParser::InvalidArgument, 'must be a number greater than 0' if runs < 1
+          fail OptionParser::InvalidArgument, 'must be a number greater than 0' if runs < 1
 
           options[:runs] = runs
         end

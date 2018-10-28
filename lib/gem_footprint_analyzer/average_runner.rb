@@ -7,7 +7,7 @@ module GemFootprintAnalyzer
     # @param runs [Integer] optional number of runs to perform
     # @param run_block [proc] actual unit of work to be done runs times
     def initialize(runs = RUNS, &run_block)
-      raise ArgumentError, 'runs must be > 0' unless runs > 0
+      fail ArgumentError, 'runs must be > 0' unless runs > 0
 
       @run_block = run_block
       @runs = runs

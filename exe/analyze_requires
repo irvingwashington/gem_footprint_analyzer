@@ -10,4 +10,4 @@ cli = GemFootprintAnalyzer::CLI.new
 t1 = Time.now.to_f
 cli.run(ARGV)
 t2 = Time.now.to_f
-puts format("\nTotal runtime %0.4fs", (t2 - t1))
+STDERR.puts(format("\nTotal runtime %0.4fs", (t2 - t1)))
