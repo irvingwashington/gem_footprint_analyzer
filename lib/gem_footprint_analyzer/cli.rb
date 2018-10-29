@@ -100,7 +100,13 @@ module GemFootprintAnalyzer
 
     def clean_up
       fork_waiters = Thread.list.select { |th| th.is_a?(Process::Waiter) }
-      fork_waiters.each { |waiter| Process.kill('TERM', waiter.pid) }
+      fork_waiters.each do |waiter|
+        begin
+          Process.kill('TERM', waiter.pid)
+        rescue Errno::ESRCH
+          nil
+        end
+      end
     end
   end
 end
