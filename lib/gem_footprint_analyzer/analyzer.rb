@@ -1,9 +1,9 @@
 module GemFootprintAnalyzer
   # A class that faciliates sampling of the original require and subsequent require calls from
   # within the library.
-  # It forks the original process and runs the first require in that fork explicitly.
+  # It initializes ChildProcess and uses it to start the require cycle in a controlled environment.
   # Require calls are interwoven with RSS checks done from the parent process, require timing
-  # is gathered in the fork and passed along to the parent.
+  # is gathered in the child process and passed along to the parent.
   class Analyzer
     # @param library [String] name of the library or parameter for the gem method
     #   (ex. 'activerecord', 'activesupport')
@@ -11,16 +11,15 @@ module GemFootprintAnalyzer
     #   (ex. 'active_record', 'active_support/time')
     # @return [Array<Hash>] list of require-data-hashes, first element contains base level RSS,
     #   last element can be treated as a summary as effectively it consists of all the previous.
+    def initialize(fifos)
+      @fifos = fifos
+    end
+
     def test_library(library, require_string = nil)
-      try_activate_gem(library)
-
-      child_transport, parent_transport = init_transports
-
-      process_id = fork_and_require(require_string || library, child_transport)
-      fail 'Unable to fork' unless process_id
-
-      detach_process(process_id)
-      requires = collect_requires(parent_transport, process_id)
+      child = ChildProcess.new(library, require_string, fifos)
+      child.start_child
+      parent_transport = init_transport
+      requires = collect_requires(parent_transport, child.pid)
 
       parent_transport.ack
       requires
@@ -28,22 +27,7 @@ module GemFootprintAnalyzer
 
     private
 
-    def fork_and_require(require_string, child_transport)
-      fork do
-        RequireSpy.spy_require(child_transport)
-        begin
-          require(require_string)
-        rescue LoadError => e
-          child_transport.exit_with_error(e)
-          exit
-        end
-        child_transport.done_and_wait_for_ack
-      end
-    end
-
-    def detach_process(pid)
-      Process.detach(pid)
-    end
+    attr_reader :fifos
 
     def collect_requires(transport, process_id)
       requires_context = {base_rss: nil, requires: [], process_id: process_id, transport: transport}
@@ -89,30 +73,15 @@ module GemFootprintAnalyzer
       context[:requires] << {base: true, rss: context[:base_rss]}
     end
 
-    def try_activate_gem(library)
-      return unless Kernel.respond_to?(:gem)
-
-      gem(library)
-    rescue Gem::LoadError
-      nil
-    end
-
-    def pkill(process_id)
-      Process.kill('TERM', process_id)
-    end
-
     def rss(process_id)
       `ps -o rss -p #{process_id}`.split.last.strip.to_i
     end
 
-    def init_transports
-      child_reader, parent_writer = IO.pipe
-      parent_reader, child_writer = IO.pipe
+    def init_transport
+      reader = File.open(fifos[:child], 'r')
+      writer = File.open(fifos[:parent], 'w')
 
-      child_transport = GemFootprintAnalyzer::Transport.new(child_reader, child_writer)
-      parent_transport = GemFootprintAnalyzer::Transport.new(parent_reader, parent_writer)
-
-      [child_transport, parent_transport]
+      Transport.new(read_stream: reader, write_stream: writer)
     end
   end
 end

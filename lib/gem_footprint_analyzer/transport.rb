@@ -4,7 +4,7 @@ module GemFootprintAnalyzer
   class Transport
     # @param read_stream [IO] stream that will be used to read from by this {Transport} instance
     # @param write_stream [IO] stream that will be used to write to by this {Transport} instance
-    def initialize(read_stream, write_stream)
+    def initialize(read_stream:, write_stream:)
       @read_stream = read_stream
       @write_stream = write_stream
     end
@@ -33,7 +33,7 @@ module GemFootprintAnalyzer
 
     # Sends a done command and blocks until ack command is received
     def done_and_wait_for_ack
-      @write_stream.puts 'done'
+      write_raw_command 'done'
       while (cmd = read_one_command)
         msg, = cmd
         break if msg == :ack
@@ -42,37 +42,42 @@ module GemFootprintAnalyzer
 
     # Sends a ready command
     def ready
-      @write_stream.puts 'ready'
+      write_raw_command 'ready'
     end
 
     # Sends a start command
     def start
-      @write_stream.puts 'start'
+      write_raw_command 'start'
     end
 
     # Sends an ack command
     def ack
-      @write_stream.puts 'ack'
+      write_raw_command 'ack'
     end
 
     # @param library [String] Name of the library that was required
     # @param source [String] Name of the source file that required the library
     # @param duration [Float] Time which it took to complete the require
     def report_require(library, source, duration)
-      @write_stream.puts "rq: #{library.inspect},#{source.inspect},#{duration.inspect}"
+      write_raw_command "rq: #{library.inspect},#{source.inspect},#{duration.inspect}"
     end
 
     # @param library [String] Name of the library that was required, but was already required before
     def report_already_required(library)
-      @write_stream.puts "arq: #{library.inspect}"
+      write_raw_command "arq: #{library.inspect}"
     end
 
     # @param error [Exception] Exception object that should halt the program
     def exit_with_error(error)
-      @write_stream.puts "exit: #{error.to_s.inspect}"
+      write_raw_command "exit: #{error.to_s.inspect}"
     end
 
     private
+
+    def write_raw_command(command)
+      @write_stream.puts(command)
+      @write_stream.flush
+    end
 
     def read_raw_command
       @read_stream.gets.strip
