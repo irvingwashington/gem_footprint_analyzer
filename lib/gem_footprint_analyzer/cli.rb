@@ -1,4 +1,5 @@
 require 'optparse'
+require 'tmpdir'
 
 module GemFootprintAnalyzer
   # A command line interface class for the gem.
@@ -9,7 +10,8 @@ module GemFootprintAnalyzer
       @options[:runs] = 10
       @options[:debug] = false
       @options[:formatter] = 'tree'
-      @options[:skip_rubygems] = false
+
+      try_require_bundler
     end
 
     # @param args [Array<String>] runs the analyzer with parsed args taken as options
@@ -21,7 +23,6 @@ module GemFootprintAnalyzer
         puts opts_parser
         exit 1
       end
-      require 'rubygems' unless options[:skip_rubygems]
 
       print_requires(options, args)
     end
@@ -39,15 +40,31 @@ module GemFootprintAnalyzer
 
     def capture_requires(options, args)
       GemFootprintAnalyzer::AverageRunner.new(options[:runs]) do
-        GemFootprintAnalyzer::Analyzer.new.test_library(*args)
+        fifos = init_fifos
+
+        GemFootprintAnalyzer::Analyzer.new(fifos).test_library(*args).tap do
+          clean_up_fifos(fifos)
+        end
       end.run
     end
 
-    def formatter_instance(options)
-      require 'gem_footprint_analyzer/formatters/text_base'
-      require 'gem_footprint_analyzer/formatters/tree'
-      require 'gem_footprint_analyzer/formatters/json'
+    def init_fifos
+      dir = Dir.mktmpdir
+      parent_name = File.join(dir, 'parent.fifo')
+      child_name = File.join(dir, 'child.fifo')
 
+      File.mkfifo(parent_name)
+      File.mkfifo(child_name)
+
+      {parent: parent_name, child: child_name}
+    end
+
+    def clean_up_fifos(fifos)
+      fifos.each { |_, name| File.unlink(name) if File.exist?(name) }
+      Dir.unlink(File.dirname(fifos[:parent]))
+    end
+
+    def formatter_instance(options)
       GemFootprintAnalyzer::Formatters.const_get(options[:formatter].capitalize)
     end
 
@@ -70,14 +87,6 @@ module GemFootprintAnalyzer
           opts.banner += debug_banner if debug
 
           options[:debug] = debug
-        end
-
-        opts.on(
-          '-g', '--disable-gems',
-          'Don\'t require rubygems (recommended for standard library analyses)'
-        ) do |skip_rubygems|
-
-          options[:skip_rubygems] = skip_rubygems
         end
 
         opts.on_tail('-h', '--help', 'Show this message') do
@@ -107,6 +116,12 @@ module GemFootprintAnalyzer
           nil
         end
       end
+    end
+
+    def try_require_bundler
+      require 'bundler/setup'
+    rescue LoadError
+      nil
     end
   end
 end

@@ -1,3 +1,4 @@
+require: rubocop-rspec
 AllCops:
   Include:
     - 'lib/gem_footprint_analyzer/**/*.rb'
@@ -16,3 +17,6 @@ Layout/SpaceInsideHashLiteralBraces:
 
 Style/SignalException:
   EnforcedStyle: semantic
+
+RSpec/NestedGroups:
+  Max: 5

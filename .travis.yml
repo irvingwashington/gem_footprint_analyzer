@@ -3,12 +3,12 @@ sudo: false
 language: ruby
 cache: bundler
 rvm:
-  - 2.5.1
+  - 2.5.3
   - 2.2
 before_install:
-  - gem install bundler -v 1.16.4
+  - gem install bundler -v 1.17.1
 script:
   - bundle exec rubocop
   - bundle exec rspec
   - bundle exec analyze_requires -d rubocop
-  - bundle exec analyze_requires -g net/http
+  - bundle exec analyze_requires net/http
