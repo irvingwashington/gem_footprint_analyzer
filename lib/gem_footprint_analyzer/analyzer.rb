@@ -5,16 +5,17 @@ module GemFootprintAnalyzer
   # Require calls are interwoven with RSS checks done from the parent process, require timing
   # is gathered in the child process and passed along to the parent.
   class Analyzer
+    # @param fifos [Hash<Symbol>] Hash containing filenames of :child and :parent FIFO files
+    def initialize(fifos)
+      @fifos = fifos
+    end
+
     # @param library [String] name of the library or parameter for the gem method
     #   (ex. 'activerecord', 'activesupport')
     # @param require_string [String|nil] optional require string, if it differs from the gem name
     #   (ex. 'active_record', 'active_support/time')
     # @return [Array<Hash>] list of require-data-hashes, first element contains base level RSS,
     #   last element can be treated as a summary as effectively it consists of all the previous.
-    def initialize(fifos)
-      @fifos = fifos
-    end
-
     def test_library(library, require_string = nil)
       child = ChildProcess.new(library, require_string, fifos)
       child.start_child
