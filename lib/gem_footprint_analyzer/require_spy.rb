@@ -15,8 +15,8 @@ module GemFootprintAnalyzer
         full_path.sub(%r{\A#{load_path}/}, '')
       end
 
-      def first_foreign_caller(caller)
-        ffc = caller.find do |c|
+      def first_foreign_caller(caller_list)
+        ffc = caller_list.find do |c|
           GemFootprintAnalyzer::RequireSpy.relative_path(c) !~ /gem_footprint_analyzer/
         end
         GemFootprintAnalyzer::RequireSpy.relative_path(ffc).sub(/\.rb\z/, '') if ffc
