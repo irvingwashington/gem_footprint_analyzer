@@ -10,7 +10,7 @@ Requires Ruby >= 2.2.0, works on Linux and MacOS.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'gem_footprint_analyzer'
+gem 'gem_footprint_analyzer', require: false
 ```
 
 And then execute:
