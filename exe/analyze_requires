@@ -7,7 +7,7 @@ require 'gem_footprint_analyzer'
 
 cli = GemFootprintAnalyzer::CLI.new
 
-t1 = Time.now.to_f
+t1 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 cli.run(ARGV)
-t2 = Time.now.to_f
+t2 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 STDERR.puts(format("\nTotal runtime %0.4fs", (t2 - t1)))

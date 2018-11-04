@@ -37,9 +37,9 @@ module GemFootprintAnalyzer
 
       def define_timed_exec
         Kernel.send :define_method, :timed_exec do |&block|
-          start_time = Time.now.to_f
+          start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           block.call
-          (Time.now.to_f - start_time).round(4)
+          (Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time).round(4)
         end
       end
 
