@@ -10,7 +10,7 @@ RSpec.describe GemFootprintAnalyzer::ChildProcess do
 
     before do
       allow(instance).to receive(:context_file).and_return('child_context.rb')
-      stub_const('GemFootprintAnalyzer::ChildProcess::RUBY_CMD', ['ruby', '--param'])
+      allow(instance).to receive(:ruby_command).and_return(['ruby', '--param'])
     end
 
     it 'runs new Ruby process in another thread' do # rubocop:disable RSpec/ExampleLength
