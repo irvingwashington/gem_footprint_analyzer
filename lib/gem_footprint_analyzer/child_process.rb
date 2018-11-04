@@ -29,7 +29,6 @@ module GemFootprintAnalyzer
       return unless child_thread
 
       sleep 0.01 while @pid.nil?
-
       @pid
     end
 

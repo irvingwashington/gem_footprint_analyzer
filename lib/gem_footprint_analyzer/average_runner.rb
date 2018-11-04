@@ -16,10 +16,7 @@ module GemFootprintAnalyzer
     # @return [Array<Hash>] Array of hashes that now include average metrics in place of fields
     #   present in {AVERAGED_FIELDS}. The rest of the columns is copied from the first sample.
     def run
-      results = []
-      @runs.times do
-        results << run_once
-      end
+      results = Array.new(@runs) { run_once }
       calculate_averages(results)
     end
 
@@ -50,8 +47,8 @@ module GemFootprintAnalyzer
       sum = values.sum.to_f
       mean = sum / num
 
-      stddev = Math.sqrt(values.sum { |v| (v - mean)**2 } / num)
-      {mean: mean, sttdev: stddev}
+      stddev = Math.sqrt(values.sum { |v| (v - mean)**2 } / num).round(4)
+      {mean: mean, stddev: stddev}
     end
 
     def initialize_average_with_copied_fields(sample)

@@ -21,6 +21,7 @@ module GemFootprintAnalyzer
         require(require_string)
       rescue LoadError => e
         transport.exit_with_error(e)
+        exit 1
       end
       transport.done_and_wait_for_ack
     end

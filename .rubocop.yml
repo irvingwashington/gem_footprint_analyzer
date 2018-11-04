@@ -8,12 +8,19 @@ AllCops:
 
 Metrics/LineLength:
   Max: 100
+  Exclude:
+    - 'spec/gem_footprint_analyzer/require_spy_spec.rb'
+    - 'spec/gem_footprint_analyzer/cli_spec.rb'
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
+
+Layout/IndentHeredoc:
+  Exclude:
+    - 'spec/gem_footprint_analyzer/cli_spec.rb'
 
 Style/SignalException:
   EnforcedStyle: semantic
@@ -24,3 +31,11 @@ RSpec/NestedGroups:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+RSpec/MultipleExpectations:
+  Exclude:
+    - 'spec/**/*.rb'
+
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+
