@@ -9,7 +9,7 @@ module GemFootprintAnalyzer
       @write_stream = write_stream
     end
 
-    # @return [Array] A tuple with command and *payload
+    # @return [Array|nil] A tuple with command and *payload or nil when command not recognized
     def read_one_command
       case read_raw_command
       when /\A(done|ack|start|ready)\z/

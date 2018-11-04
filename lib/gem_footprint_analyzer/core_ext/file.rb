@@ -3,7 +3,7 @@ module GemFootprintAnalyzer
     # Provides File#mkfifo, missing in Ruby 2.2.0
     module File
       def mkfifo(name)
-        system("mkfifo #{name}")
+        system("mkfifo #{name}") || fail('Failed to make FIFO special file')
       end
     end
   end
