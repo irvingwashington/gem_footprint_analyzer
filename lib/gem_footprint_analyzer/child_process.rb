@@ -4,6 +4,7 @@ require 'rbconfig'
 module GemFootprintAnalyzer
   # A class for starting the child process that does actual requires.
   class ChildProcess
+    LEGACY_RUBY_CMD = [RbConfig.ruby, '--disable=gem'].freeze
     RUBY_CMD = [RbConfig.ruby, '--disable=did_you_mean', '--disable=gem'].freeze
 
     def initialize(library, require_string, fifos)
@@ -15,7 +16,7 @@ module GemFootprintAnalyzer
 
     def start_child
       @child_thread ||= Thread.new do # rubocop:disable Naming/MemoizedInstanceVariableName
-        Open3.popen3(child_env_vars, *RUBY_CMD, context_file) do |_, stdout, stderr|
+        Open3.popen3(child_env_vars, *ruby_command, context_file) do |_, stdout, stderr|
           @pid = stdout.gets.strip.to_i
 
           while (line = stderr.gets)
@@ -35,6 +36,14 @@ module GemFootprintAnalyzer
     private
 
     attr_reader :require_string, :child_thread, :fifos
+
+    def ruby_command
+      if RbConfig::CONFIG['MAJOR'].to_i >= 2 && RbConfig::CONFIG['MINOR'].to_i >= 3
+        RUBY_CMD
+      else
+        LEGACY_RUBY_CMD
+      end
+    end
 
     def child_env_vars
       {
