@@ -11,7 +11,8 @@ module GemFootprintAnalyzer
       # Displays explanatory words for text formatter results
       def info
         lines = []
-        lines << "GemFootprintAnalyzer (#{GemFootprintAnalyzer::VERSION})\n"
+        lines << "GemFootprintAnalyzer (#{GemFootprintAnalyzer::VERSION})"
+        lines << (debug? ? "(#{File.expand_path(File.join(File.dirname(__FILE__), '..'))})\n" : '')
         lines << "Analyze results (average measured from #{@options[:runs]} run(s))"
         lines << 'time is the amount of time given require has taken to complete'
         lines << 'RSS is total memory increase up to the point after the require'
@@ -22,6 +23,12 @@ module GemFootprintAnalyzer
       # @return [String] Awesome text separator
       def dash(length)
         '-' * length
+      end
+
+      private
+
+      def debug?
+        @options[:debug]
       end
     end
   end

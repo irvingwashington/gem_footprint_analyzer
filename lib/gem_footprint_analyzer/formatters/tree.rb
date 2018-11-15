@@ -7,9 +7,9 @@ module GemFootprintAnalyzer
       INDENT = '  '.freeze
       # Formatter helper class representing a single results require entry.
       class Entry
-        def initialize(entry_hash, _options = {})
+        def initialize(entry_hash, options = {})
           @entry_hash = entry_hash
-          @options = {}
+          @options = options
         end
 
         def name
@@ -39,7 +39,7 @@ module GemFootprintAnalyzer
         def debug_parent
           return unless @options[:debug]
 
-          "(#{parent})"
+          " (#{parent})"
         end
       end
 
@@ -53,12 +53,13 @@ module GemFootprintAnalyzer
       private
 
       def formatted_entries(entries)
-        indent_levels, max_indent = count_indent_levels(entries)
-        max_name_length = entries.map { |e| e.name.length }.max
+        max_indent = max_indent(entries)
+        max_name_length = entries.map { |e| e.formatted_name.length }.max
         ljust_value = max_name_length + max_indent + 1
 
         lines = entries.reverse.map do |entry|
-          format_entry(entry, indent_levels, ljust_value)
+          indent_level = count_indent_level(entry)
+          format_entry(entry, indent_level, ljust_value)
         end
 
         (legend(ljust_value) + lines).join("\n")
@@ -71,8 +72,8 @@ module GemFootprintAnalyzer
         ]
       end
 
-      def format_entry(entry, indent_levels, ljust_value)
-        indent = INDENT * indent_levels[entry.name]
+      def format_entry(entry, indent_level, ljust_value)
+        indent = INDENT * indent_level
         time = format('%5dms', entry.time)
         rss = format('%7dKB', entry.rss)
 
@@ -83,6 +84,22 @@ module GemFootprintAnalyzer
         requires_list.last(requires_list.size - 1).map do |entry_hash|
           Entry.new(entry_hash, @options)
         end
+      end
+
+      def max_indent(entries)
+        entries.reverse_each { |entry| count_indent_level(entry) }
+        max_indent_level = @indent_levels.map(&:values).flatten.max
+        @indent_levels = []
+        max_indent_level * INDENT.size
+      end
+
+      def count_indent_level(entry)
+        @indent_levels ||= []
+        parent_hash = @indent_levels.find { |elem| elem.key?(entry.parent) }
+        parent_level = parent_hash ? parent_hash.values.first : -1
+        indent_level = parent_level + 1
+        @indent_levels.unshift(entry.name => indent_level)
+        indent_level
       end
 
       def count_indent_levels(entries)

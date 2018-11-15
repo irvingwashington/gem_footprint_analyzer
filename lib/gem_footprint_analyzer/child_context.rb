@@ -20,6 +20,7 @@ module GemFootprintAnalyzer
       begin
         require(require_string)
       rescue LoadError => e
+        warn_about_load_error(e)
         transport.exit_with_error(e)
         exit 1
       end
@@ -52,6 +53,16 @@ module GemFootprintAnalyzer
     def output(message)
       STDOUT.puts(message)
       STDOUT.flush
+    end
+
+    def warn_about_load_error(error)
+      possible_gem = error.message.split.last
+      STDERR.puts "Cannot load '#{possible_gem}', this might be an issue with implicit require in" \
+        " the '#{require_string}'"
+      STDERR.puts "If '#{possible_gem}' is a gem, you can try adding it to the Gemfile explicitly" \
+        ", running `bundle install` and trying again\n\n"
+      STDERR.puts error.backtrace
+      STDERR.flush
     end
   end
 end

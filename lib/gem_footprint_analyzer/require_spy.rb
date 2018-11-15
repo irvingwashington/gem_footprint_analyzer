@@ -15,11 +15,15 @@ module GemFootprintAnalyzer
         full_path.sub(%r{\A#{load_path}/}, '')
       end
 
+      def without_extension(name)
+        name.sub(/\.rb\z/, '')
+      end
+
       def first_foreign_caller(caller_list)
         ffc = caller_list.find do |c|
-          GemFootprintAnalyzer::RequireSpy.relative_path(c) !~ /gem_footprint_analyzer/
+          relative_path(c) !~ /gem_footprint_analyzer/
         end
-        GemFootprintAnalyzer::RequireSpy.relative_path(ffc).sub(/\.rb\z/, '') if ffc
+        without_extension(relative_path(ffc)) if ffc
       end
 
       def spy_require(transport)
@@ -53,7 +57,8 @@ module GemFootprintAnalyzer
           t = timed_exec { result = regular_require(name) }
 
           first_foreign_caller = GemFootprintAnalyzer::RequireSpy.first_foreign_caller(caller)
-          transport.report_require(name, first_foreign_caller || '', t)
+          bare_name = GemFootprintAnalyzer::RequireSpy.without_extension(name)
+          transport.report_require(bare_name, first_foreign_caller || '', t)
           result
         end
       end
