@@ -20,7 +20,7 @@ module GemFootprintAnalyzer
           @pid = stdout.gets.strip.to_i
 
           while (line = stderr.gets)
-            puts "!! #{line.strip}"
+            print "!! #{line}"
           end
         end
       end

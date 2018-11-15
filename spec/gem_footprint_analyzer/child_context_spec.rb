@@ -74,7 +74,7 @@ RSpec.describe GemFootprintAnalyzer::ChildContext do
       it 'calls RequireSpy.spy_require and transport.exit_with_error' do
         expect(GemFootprintAnalyzer::RequireSpy).to receive(:spy_require).with(transport)
         expect(transport).to receive(:exit_with_error).with(an_instance_of(LoadError))
-
+        expect(STDERR).to receive(:puts).exactly(3).times
         expect { action }.to raise_error(SystemExit)
       end
     end
