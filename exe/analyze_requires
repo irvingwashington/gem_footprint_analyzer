@@ -3,6 +3,8 @@
 $LOAD_PATH.unshift(File.join(__dir__, '..', 'lib'))
 $LOAD_PATH.unshift('./lib') if Dir.exist?('lib')
 
+require 'bundler/setup' if ENV.key?('BUNDLER_VERSION')
+
 require 'gem_footprint_analyzer'
 
 cli = GemFootprintAnalyzer::CLI.new
