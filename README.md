@@ -1,6 +1,6 @@
 # GemFootprintAnalyzer
 [![Gem Version](https://badge.fury.io/rb/gem_footprint_analyzer.svg)](https://badge.fury.io/rb/gem_footprint_analyzer)
-[![Build Status](https://travis-ci.com/irvingwashington/gem_footprint_analyzer.svg?branch=master)](https://travis-ci.com/irvingwashington/gem_footprint_analyzer)
+[![Build Status](https://api.travis-ci.org/irvingwashington/gem_footprint_analyzer.svg?branch=master)](https://travis-ci.org/irvingwashington/gem_footprint_analyzer)
 
 A tool for analyzing time and RSS footprint of gems or standard library requires.
 Requires Ruby >= 2.2.0, works on Linux and MacOS.
