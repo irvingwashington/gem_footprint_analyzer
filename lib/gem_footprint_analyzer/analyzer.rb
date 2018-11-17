@@ -6,7 +6,8 @@ module GemFootprintAnalyzer
   # is gathered in the child process and passed along to the parent.
   class Analyzer
     # @param fifos [Hash<Symbol>] Hash containing filenames of :child and :parent FIFO files
-    def initialize(fifos)
+    def initialize(fifos, options = {})
+      @options = options
       @fifos = fifos
     end
 
@@ -17,7 +18,7 @@ module GemFootprintAnalyzer
     # @return [Array<Hash>] list of require-data-hashes, first element contains base level RSS,
     #   last element can be treated as a summary as effectively it consists of all the previous.
     def test_library(library, require_string = nil)
-      child = ChildProcess.new(library, require_string, fifos)
+      child = ChildProcess.new(library, require_string, fifos, options)
       child.start_child
       parent_transport = init_transport
       requires = collect_requires(parent_transport, child.pid)
@@ -28,7 +29,7 @@ module GemFootprintAnalyzer
 
     private
 
-    attr_reader :fifos
+    attr_reader :fifos, :options
 
     def collect_requires(transport, process_id)
       requires_context = {base_rss: nil, requires: [], process_id: process_id, transport: transport}

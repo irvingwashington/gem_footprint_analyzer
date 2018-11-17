@@ -41,7 +41,7 @@ module GemFootprintAnalyzer
       GemFootprintAnalyzer::AverageRunner.new(options[:runs]) do
         fifos = init_fifos
 
-        GemFootprintAnalyzer::Analyzer.new(fifos).test_library(*args).tap do
+        GemFootprintAnalyzer::Analyzer.new(fifos, options).test_library(*args).tap do
           clean_up_fifos(fifos)
         end
       end.run
@@ -80,6 +80,10 @@ module GemFootprintAnalyzer
           fail OptionParser::InvalidArgument, 'must be a number greater than 0' if runs < 1
 
           options[:runs] = runs
+        end
+
+        opts.on('-g', '--rubygems', 'Require rubygems before the actual analyze') do |rubygems|
+          options[:rubygems] = rubygems
         end
 
         opts.on('-d', '--debug', 'Show debug information') do |debug|
