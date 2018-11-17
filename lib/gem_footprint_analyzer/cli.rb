@@ -31,7 +31,6 @@ module GemFootprintAnalyzer
 
     def print_requires(options, args)
       requires_list_average = capture_requires(options, args)
-      at_exit { clean_up }
       formatter = formatter_instance(options)
       puts formatter.new(options).format_list(requires_list_average)
     end
@@ -105,17 +104,6 @@ module GemFootprintAnalyzer
 
     def debug_banner
       "\n(#{File.expand_path(File.join(File.dirname(__FILE__), '..'))})"
-    end
-
-    def clean_up
-      fork_waiters = Thread.list.select { |th| th.is_a?(Process::Waiter) }
-      fork_waiters.each do |waiter|
-        begin
-          Process.kill('TERM', waiter.pid)
-        rescue Errno::ESRCH
-          nil
-        end
-      end
     end
 
     def try_require_bundler
