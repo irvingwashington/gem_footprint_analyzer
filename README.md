@@ -5,22 +5,6 @@
 A tool for analyzing time and RSS footprint of gems or standard library requires.
 Requires Ruby >= 2.2.0, works on Linux and MacOS.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'gem_footprint_analyzer', require: false
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install gem_footprint_analyzer
-
 ## Usage
 
 You can use this gem with or without Bundler. Using Bundler is more convenient and does not have any
@@ -44,6 +28,22 @@ $ analyze_requires net/http
 # Analyzing gems without Bundler will require you provide all dependencies paths in the RUBYLIB env var
 $ RUBYLIB=/Users/irving/.gem/ruby/2.5.3/gems/activerecord-5.2.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/activesupport-5.2.1/lib/:/Users/irving/.gem/ruby/2.5.3/gems/concurrent-ruby-1.0.5/lib:/Users/irving/.gem/ruby/2.5.3/gems/i18n-1.1.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/activemodel-5.2.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/arel-9.0.0/lib:/Users/irving/.gem/ruby/2.5.3/gems/tzinfo-1.2.5/lib:/Users/irving/.gem/ruby/2.5.3/gems/thread_safe-0.3.6/lib analyze_requries activerecord active_record
 ```
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'gem_footprint_analyzer', require: false
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install gem_footprint_analyzer
 
 ## Example analyses (Ruby 2.5.3):
 
@@ -397,7 +397,7 @@ Total runtime 0.9878s
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gem_footprint_analyzer. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/irvingwashington/gem_footprint_analyzer. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
