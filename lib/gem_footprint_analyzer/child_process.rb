@@ -50,6 +50,7 @@ module GemFootprintAnalyzer
       {
         'require_string' => require_string,
         'require_rubygems' => options.key?(:rubygems) && 'true' || nil,
+        'analyze_gemfile' => options.key?(:analyze_gemfile) && 'true' || nil,
         'start_child_context' => 'true',
         'child_fifo' => fifos[:child],
         'parent_fifo' => fifos[:parent],

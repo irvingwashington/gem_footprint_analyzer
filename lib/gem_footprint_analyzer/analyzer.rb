@@ -11,13 +11,14 @@ module GemFootprintAnalyzer
       @fifos = fifos
     end
 
-    # @param library [String] name of the library or parameter for the gem method
-    #   (ex. 'activerecord', 'activesupport')
+    # @param library [String|nil] name of the library or parameter for the gem method
+    #   (ex. 'activerecord', 'activesupport').
+    #   Nil if user wants to analyze the whole Gemfile
     # @param require_string [String|nil] optional require string, if it differs from the gem name
     #   (ex. 'active_record', 'active_support/time')
     # @return [Array<Hash>] list of require-data-hashes, first element contains base level RSS,
     #   last element can be treated as a summary as effectively it consists of all the previous.
-    def test_library(library, require_string = nil)
+    def test_library(library = nil, require_string = nil)
       child = ChildProcess.new(library, require_string, fifos, options)
       child.start_child
       parent_transport = init_transport

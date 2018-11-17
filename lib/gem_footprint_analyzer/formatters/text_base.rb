@@ -16,8 +16,8 @@ module GemFootprintAnalyzer
         lines << "Analyze results (average measured from #{@options[:runs]} run(s))"
         lines << 'time is the amount of time given require has taken to complete'
         lines << 'RSS is total memory increase up to the point after the require'
-        lines << "\n"
-        lines.join("\n")
+        lines << ''
+        lines
       end
 
       # @return [String] Awesome text separator

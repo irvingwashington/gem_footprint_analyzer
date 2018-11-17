@@ -4,12 +4,13 @@ RSpec.describe GemFootprintAnalyzer::RequireSpy do
   describe '.relative_path' do
     subject { described_class.relative_path(caller_entry, require_name) }
 
-    let(:caller_entry) { "ruby-2.5.3/lib/ruby/2.5.0/uri.rb:112:in '<top (required)>'" }
+    let(:caller_entry) { "/ruby-2.5.3/lib/ruby/2.5.0/uri.rb:112:in '<top (required)>'" }
 
     around do |example|
-      $LOAD_PATH.unshift('ruby-2.5.3/lib/ruby/2.5.0')
+      $LOAD_PATH.unshift('/ruby-2.5.3/lib/ruby/2.5.0')
+      described_class.instance_variable_set('@load_paths', nil)
       example.call
-      $LOAD_PATH.delete('ruby-2.5.3/lib/ruby/2.5.0')
+      $LOAD_PATH.delete('/ruby-2.5.3/lib/ruby/2.5.0')
     end
 
     context 'when require_name is set' do
@@ -63,9 +64,8 @@ RSpec.describe GemFootprintAnalyzer::RequireSpy do
 
     it 'calls all helper functions' do
       expect(described_class).to receive(:alias_require_methods)
-      expect(described_class).to receive(:define_timed_exec)
-      expect(described_class).to receive(:define_require_relative)
-      expect(described_class).to receive(:define_require).with(transport)
+      expect(described_class).to receive(:define_require_relatives)
+      expect(described_class).to receive(:define_requires).with(transport)
 
       action
     end
@@ -82,31 +82,25 @@ RSpec.describe GemFootprintAnalyzer::RequireSpy do
     end
   end
 
-  shared_examples 'defines the method' do |method_name|
+  shared_examples 'defines the method' do |klass, method_name|
     it 'defines the method' do
-      expect(Kernel).to receive(:define_method).with(method_name)
+      expect(klass).to receive(:define_method).with(method_name)
 
       action
     end
   end
 
-  describe '.define_timed_exec' do
-    subject(:action) { described_class.define_timed_exec }
-
-    include_examples 'defines the method', :timed_exec
-  end
-
   describe '.define_require' do
-    subject(:action) { described_class.define_require(transport) }
+    subject(:action) { described_class.define_requires(transport) }
 
     let(:transport) { instance_double(GemFootprintAnalyzer::Transport) }
 
-    include_examples 'defines the method', :require
+    include_examples 'defines the method', Kernel, :require
   end
 
   describe '.define_require_relative' do
-    subject(:action) { described_class.define_require_relative }
+    subject(:action) { described_class.define_require_relatives }
 
-    include_examples 'defines the method', :require_relative
+    include_examples 'defines the method', Kernel, :require_relative
   end
 end

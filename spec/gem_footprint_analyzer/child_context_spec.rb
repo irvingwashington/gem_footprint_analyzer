@@ -79,4 +79,34 @@ RSpec.describe GemFootprintAnalyzer::ChildContext do
       end
     end
   end
+
+  describe '#try_require' do
+    subject(:action) { instance.__send__(:try_require, require_string) }
+
+    around do |example|
+      ENV['analyze_gemfile'] = analyze_gemfile
+      example.call
+      ENV.delete('analyze_gemfile')
+    end
+
+    context 'when analyze_gemfile ENV var is set' do
+      let(:analyze_gemfile) { 'true' }
+
+      it 'calls Bundler' do
+        expect(Bundler).to receive(:require)
+
+        action
+      end
+    end
+
+    context 'when analyze_gemfile ENV var is not set' do
+      let(:analyze_gemfile) { nil }
+
+      it 'does not call Bundler' do
+        expect(Bundler).not_to receive(:require)
+
+        action
+      end
+    end
+  end
 end

@@ -12,3 +12,5 @@ script:
   - bundle exec rspec
   - bundle exec analyze_requires -d rubocop
   - bundle exec analyze_requires net/http
+  - bundle exec analyze_requires -g -n1 -d
+#  - exe/analyze_requires -n1 net/http|head # Hangs Travis, TODO: investigate

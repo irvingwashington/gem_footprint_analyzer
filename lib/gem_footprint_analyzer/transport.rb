@@ -24,7 +24,9 @@ module GemFootprintAnalyzer
     end
 
     # Blocks until a :start command is received from the read stream
-    def wait_for_start
+    def ready_and_wait_for_start
+      write_raw_command 'ready'
+
       while (cmd = read_one_command)
         msg, = cmd
         break if msg == :start
@@ -38,11 +40,6 @@ module GemFootprintAnalyzer
         msg, = cmd
         break if msg == :ack
       end
-    end
-
-    # Sends a ready command
-    def ready
-      write_raw_command 'ready'
     end
 
     # Sends a start command
@@ -59,7 +56,7 @@ module GemFootprintAnalyzer
     # @param source [String] Name of the source file that required the library
     # @param duration [Float] Time which it took to complete the require
     def report_require(library, source, duration)
-      write_raw_command "rq: #{library.inspect},#{source.inspect},#{duration.inspect}"
+      write_raw_command "rq: #{library.inspect},#{(source || '').inspect},#{duration.inspect}"
     end
 
     # @param library [String] Name of the library that was required, but was already required before
