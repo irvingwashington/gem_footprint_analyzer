@@ -12,19 +12,17 @@ module GemFootprintAnalyzer
     def initialize
       output Process.pid
       init_transport
+      require_rubygems_if_needed
     end
 
     # Installs the require-spying code and starts requiring
     def start
       RequireSpy.spy_require(transport)
-      begin
-        require(require_string)
-      rescue LoadError => e
-        warn_about_load_error(e)
-        transport.exit_with_error(e)
-        exit 1
-      end
-      transport.done_and_wait_for_ack
+      error = try_require(require_string)
+      return transport.done_and_wait_for_ack unless error
+
+      transport.exit_with_error(error)
+      exit(1)
     end
 
     private
@@ -43,6 +41,22 @@ module GemFootprintAnalyzer
       ENV['require_string']
     end
 
+    def require_rubygems
+      ENV['require_rubygems']
+    end
+
+    def try_require(require_string)
+      error = nil
+      begin
+        require(require_string)
+      rescue LoadError => error
+        warn_about_load_error(error)
+      rescue Exception => error # rubocop:disable Lint/RescueException
+        warn_about_error(error)
+      end
+      error
+    end
+
     def init_transport
       write_stream = File.open(child_fifo, 'w')
       read_stream = File.open(parent_fifo, 'r')
@@ -55,12 +69,22 @@ module GemFootprintAnalyzer
       STDOUT.flush
     end
 
+    def require_rubygems_if_needed
+      return unless require_rubygems
+
+      require 'rubygems'
+    end
+
     def warn_about_load_error(error)
       possible_gem = error.message.split.last
       STDERR.puts "Cannot load '#{possible_gem}', this might be an issue with implicit require in" \
         " the '#{require_string}'"
       STDERR.puts "If '#{possible_gem}' is a gem, you can try adding it to the Gemfile explicitly" \
         ", running `bundle install` and trying again\n\n"
+      warn_about_error(error)
+    end
+
+    def warn_about_error(error)
       STDERR.puts error.backtrace
       STDERR.flush
     end

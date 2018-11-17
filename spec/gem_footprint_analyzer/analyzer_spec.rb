@@ -27,7 +27,7 @@ RSpec.describe GemFootprintAnalyzer::Analyzer do
       expect(transport_double).to receive(:ack)
 
       expect(GemFootprintAnalyzer::ChildProcess).to receive(:new)
-        .with(library, require_string, fifos)
+        .with(library, require_string, fifos, {})
         .and_return(child_process_double)
 
       expect(instance).to receive(:init_transport).and_return(transport_double)

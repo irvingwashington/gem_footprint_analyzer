@@ -7,11 +7,12 @@ module GemFootprintAnalyzer
     LEGACY_RUBY_CMD = [RbConfig.ruby, '--disable=gem'].freeze
     RUBY_CMD = [RbConfig.ruby, '--disable=did_you_mean', '--disable=gem'].freeze
 
-    def initialize(library, require_string, fifos)
+    def initialize(library, require_string, fifos, options = {})
       @library = library
       @require_string = require_string || library
       @fifos = fifos
       @pid = nil
+      @options = options
     end
 
     def start_child
@@ -35,7 +36,7 @@ module GemFootprintAnalyzer
 
     private
 
-    attr_reader :require_string, :child_thread, :fifos
+    attr_reader :require_string, :child_thread, :fifos, :options
 
     def ruby_command
       if RbConfig::CONFIG['MAJOR'].to_i >= 2 && RbConfig::CONFIG['MINOR'].to_i >= 3
@@ -48,6 +49,7 @@ module GemFootprintAnalyzer
     def child_env_vars
       {
         'require_string' => require_string,
+        'require_rubygems' => options.key?(:rubygems) && 'true' || nil,
         'start_child_context' => 'true',
         'child_fifo' => fifos[:child],
         'parent_fifo' => fifos[:parent],
