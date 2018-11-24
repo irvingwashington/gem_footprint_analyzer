@@ -7,6 +7,9 @@ module GemFootprintAnalyzer
       %r{active_support/dependencies\.rb.+(`require'|`load_dependency'|`block in require')\z}.freeze
 
     class << self
+      # @param caller_entry [String] A single stack frame
+      # @param require_name [String|nil] An optional require name to calculate full_path from
+      # @return [String] path relative to the gem lib directory
       def relative_path(caller_entry, require_name = nil)
         caller_file = caller_entry.split(':')[0]
         if require_name
@@ -19,14 +22,19 @@ module GemFootprintAnalyzer
         full_path.sub(%r{\A#{load_path}/}, '')
       end
 
+      # @return [Array<String>] All configured load paths in the full directory form
       def load_paths
         @load_paths ||= $LOAD_PATH.map { |path| File.expand_path(path) }
       end
 
+      # @param name [String] require name
+      # @return [String] name with the .rb extension truncated
       def without_extension(name)
         name.sub(/\.rb\z/, '')
       end
 
+      # @param [Array<String>] List of caller stack frames
+      # @return [String|nil] First caller entry that doesn't originate from this gem
       def first_foreign_caller(caller_list)
         ffc = caller_list.find do |c|
           c !~ ACTIVESUPPORT_REQUIRE_DEPENDENCY &&
@@ -35,6 +43,7 @@ module GemFootprintAnalyzer
         without_extension(relative_path(ffc)) if ffc
       end
 
+      # Installs require spying on all relevant methods
       def spy_require(transport)
         alias_require_methods
 
@@ -42,6 +51,7 @@ module GemFootprintAnalyzer
         define_requires(transport)
       end
 
+      # @return [Array] Tuple with method call duration and return value
       def timed_exec
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         result = yield
@@ -49,6 +59,7 @@ module GemFootprintAnalyzer
         [duration, result]
       end
 
+      # Aliases original methods, so they are accessible from methods that shadow them
       def alias_require_methods
         kernels.each do |k|
           k.send :alias_method, :regular_require, :require
@@ -56,14 +67,19 @@ module GemFootprintAnalyzer
         end
       end
 
+      # @return [Array<Class>] CLasses that have require* methods that we'll spy on
       def kernels
         @kernels ||= [(class << ::Kernel; self; end), Kernel]
       end
 
+      # @param transport [Transport] Instance of transport to be used by the require proxy method
       def define_requires(transport)
         kernels.each { |k| define_require(k, transport) }
       end
 
+      # @param klass [Class] Target class to have the spying require defined
+      # @param transport [Transport] Instance of transport to be used by the require proxy method
+      # Replaces require methods with proxied versions
       def define_require(klass, transport)
         klass.send :define_method, :require do |name|
           transport.ready_and_wait_for_start
@@ -78,6 +94,7 @@ module GemFootprintAnalyzer
         end
       end
 
+      # Replaces require_relative methods with proxied versions
       def define_require_relatives
         # As of Ruby 2.5.1, both :require and :require_relative use an unexposed native method
         # rb_safe_require, however it's challenging to plug into it and using original

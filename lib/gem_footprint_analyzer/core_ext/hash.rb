@@ -2,6 +2,7 @@ module GemFootprintAnalyzer
   module CoreExt
     # Provides Hash#dig, missing in Ruby 2.2.0
     module Hash
+      # @param keys [Array<Symbol|String>] list of keys to dig from the hash
       def dig(*keys)
         value = self
         keys.each do |key|

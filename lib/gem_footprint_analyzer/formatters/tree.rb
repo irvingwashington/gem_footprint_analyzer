@@ -9,33 +9,41 @@ module GemFootprintAnalyzer
       class Entry
         BUNDLER_RUNTIME = 'bundler/runtime'.freeze
 
+        # @param entry_hash [Hash<Symbol>] Hash with a single require analysis
+        # @param options [Hash<Symbol>]
         def initialize(entry_hash, options = {})
           @entry_hash = entry_hash
           @options = options
         end
 
+        # @return [String] Require name
         def name
           @entry_hash[:name]
         end
 
+        # @return [String] Formatted parent require name
         def parent
           @entry_hash[:parent_name]
         end
 
+        # @return [Integer] Formatted time value
         def time
           time = @entry_hash.dig(:time, :mean)
           time && time.round
         end
 
+        # @return [Integer] Formatted RSS value
         def rss
           rss = @entry_hash.dig(:rss, :mean)
           rss && rss.round
         end
 
+        # @return [String] Formatted require name
         def formatted_name
           "#{name}#{debug_parent}"
         end
 
+        # @return [Bool] Is the entry a Gem or original require to be analyzed
         def top_level?
           parent.nil? || parent == BUNDLER_RUNTIME
         end
