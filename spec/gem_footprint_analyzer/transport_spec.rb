@@ -45,10 +45,19 @@ RSpec.describe GemFootprintAnalyzer::Transport do
     end
   end
 
-  describe '#wait_for_start' do
-    subject(:action) { transport.wait_for_start }
+  shared_examples 'writes command' do |command|
+    specify do
+      action
+      expect(write_buffer).to eq("#{command}\n")
+    end
+  end
+
+  describe '#ready_and_wait_for_start' do
+    subject(:action) { transport.ready_and_wait_for_start }
 
     let(:read_buffer) { "foo\nbar\nstart" }
+
+    include_examples 'writes command', 'ready'
 
     # Doesn't really test that, since StringIO is non-blocking
     it 'reads until gets start' do
@@ -65,19 +74,6 @@ RSpec.describe GemFootprintAnalyzer::Transport do
       action
       expect(write_buffer).to eq("done\n")
     end
-  end
-
-  shared_examples 'writes command' do |command|
-    specify do
-      action
-      expect(write_buffer).to eq("#{command}\n")
-    end
-  end
-
-  describe '#ready' do
-    subject(:action) { transport.ready }
-
-    include_examples 'writes command', 'ready'
   end
 
   describe '#start' do

@@ -7,6 +7,8 @@ module GemFootprintAnalyzer
       INDENT = '  '.freeze
       # Formatter helper class representing a single results require entry.
       class Entry
+        BUNDLER_RUNTIME = 'bundler/runtime'.freeze
+
         def initialize(entry_hash, options = {})
           @entry_hash = entry_hash
           @options = options
@@ -32,6 +34,10 @@ module GemFootprintAnalyzer
 
         def formatted_name
           "#{name}#{debug_parent}"
+        end
+
+        def top_level?
+          parent.nil? || parent == BUNDLER_RUNTIME
         end
 
         private
@@ -62,7 +68,7 @@ module GemFootprintAnalyzer
           format_entry(entry, indent_level, ljust_value)
         end
 
-        (legend(ljust_value) + lines).join("\n")
+        (legend(ljust_value) + lines)
       end
 
       def legend(ljust_value)
@@ -81,9 +87,13 @@ module GemFootprintAnalyzer
       end
 
       def init_entries(requires_list)
-        requires_list.last(requires_list.size - 1).map do |entry_hash|
+        entries = requires_list.last(requires_list.size - 1).map do |entry_hash|
           Entry.new(entry_hash, @options)
         end
+
+        entries.select!(&:top_level?) if @options[:analyze_gemfile]
+
+        entries
       end
 
       def max_indent(entries)

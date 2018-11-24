@@ -13,6 +13,7 @@ module GemFootprintAnalyzer
       output Process.pid
       init_transport
       require_rubygems_if_needed
+      require_bundler_if_needed
     end
 
     # Installs the require-spying code and starts requiring
@@ -41,6 +42,10 @@ module GemFootprintAnalyzer
       ENV['require_string']
     end
 
+    def analyze_gemfile
+      ENV['analyze_gemfile']
+    end
+
     def require_rubygems
       ENV['require_rubygems']
     end
@@ -48,7 +53,7 @@ module GemFootprintAnalyzer
     def try_require(require_string)
       error = nil
       begin
-        require(require_string)
+        analyze_gemfile ? Bundler.require : require(require_string)
       rescue LoadError => error
         warn_about_load_error(error)
       rescue Exception => error # rubocop:disable Lint/RescueException
@@ -73,6 +78,12 @@ module GemFootprintAnalyzer
       return unless require_rubygems
 
       require 'rubygems'
+    end
+
+    def require_bundler_if_needed
+      return unless analyze_gemfile
+
+      require 'bundler/setup'
     end
 
     def warn_about_load_error(error)

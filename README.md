@@ -11,6 +11,18 @@ You can use this gem with or without Bundler. Using Bundler is more convenient a
 impact on results, however you have to have `gem_footprint_analyzer` present in your Gemfile
 (use the development section).
 
+Banner
+```bash
+GemFootprintAnalyzer (0.1.6)
+Usage: bundle exec analyze_requires library_to_analyze [require]
+    -f, --formatter FORMATTER        Format output using selected formatter (json tree)
+    -n, --runs-num NUMBER            Number of runs
+    -r, --rubygems                   Require rubygems before the actual analyze
+    -g, --gemfile                    Analyze current Gemfile
+    -d, --debug                      Show debug information
+    -h, --help                       Show this message
+```
+
 1) with Bundler
 ```bash
 # Standard library
@@ -27,6 +39,41 @@ $ analyze_requires net/http
 
 # Analyzing gems without Bundler will require you provide all dependencies paths in the RUBYLIB env var
 $ RUBYLIB=/Users/irving/.gem/ruby/2.5.3/gems/activerecord-5.2.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/activesupport-5.2.1/lib/:/Users/irving/.gem/ruby/2.5.3/gems/concurrent-ruby-1.0.5/lib:/Users/irving/.gem/ruby/2.5.3/gems/i18n-1.1.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/activemodel-5.2.1/lib:/Users/irving/.gem/ruby/2.5.3/gems/arel-9.0.0/lib:/Users/irving/.gem/ruby/2.5.3/gems/tzinfo-1.2.5/lib:/Users/irving/.gem/ruby/2.5.3/gems/thread_safe-0.3.6/lib analyze_requries activerecord active_record
+```
+
+## Analyzing Gemfile
+
+GemFootprintAnalyzer can be used to analyze the whole Gemfile of a given project.
+This way, it is cleary visible which gems take most time or consume most RSS on application start.
+You can also see what kind of impact does adding a new dependency have on the the project footprint.
+As processing of all gems might take a lot of time, it is advisable to set the number of runs to 1.
+
+```bash
+# Analyze the entire Gemfile, with a single run
+irving:~/Workspace/motoperf (master)$ bundle exec analyze_requires -gn1
+GemFootprintAnalyzer (0.1.6)
+
+Analyze results (average measured from 1 run(s))
+time is the amount of time given require has taken to complete
+RSS is total memory increase up to the point after the require
+
+name                          time   RSS after
+--------------------------------------------
+newrelic_rpm                 1540ms  38540KB
+draper                        242ms  31544KB
+activemodel-serializers-xml    46ms  29248KB
+slim                          261ms  29088KB
+dalli                         107ms  26036KB
+bcrypt                         31ms  25872KB
+will_paginate                  45ms  25848KB
+jbuilder                      190ms  25844KB
+jquery-rails                   17ms  25808KB
+uglifier                      135ms  25808KB
+sass-rails                   3379ms  25676KB
+pg                            108ms  13260KB
+rails                        3516ms  12612KB
+
+Total runtime 10.0740s
 ```
 
 ## Installation

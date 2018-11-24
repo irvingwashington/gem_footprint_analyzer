@@ -1,4 +1,3 @@
-require 'optparse'
 require 'tmpdir'
 
 module GemFootprintAnalyzer
@@ -11,16 +10,16 @@ module GemFootprintAnalyzer
       @options[:debug] = false
       @options[:formatter] = 'tree'
 
-      try_require_bundler
+      @opts = Opts.new(@options)
     end
 
     # @param args [Array<String>] runs the analyzer with parsed args taken as options
     # @return [void]
     def run(args = ARGV)
-      opts_parser.parse!(args)
+      opts.parse!(args)
 
-      if args.empty?
-        puts opts_parser
+      if !analyze_gemfile? && args.empty?
+        puts opts.parser
         exit 1
       end
 
@@ -32,10 +31,12 @@ module GemFootprintAnalyzer
     def print_requires(options, args)
       requires_list_average = capture_requires(options, args)
       formatter = formatter_instance(options)
-      puts formatter.new(options).format_list(requires_list_average)
+      output = formatter.new(options).format_list(requires_list_average)
+
+      Utils.safe_puts(output)
     end
 
-    attr_reader :options
+    attr_reader :options, :opts
 
     def capture_requires(options, args)
       GemFootprintAnalyzer::AverageRunner.new(options[:runs]) do
@@ -67,53 +68,8 @@ module GemFootprintAnalyzer
       GemFootprintAnalyzer::Formatters.const_get(options[:formatter].capitalize)
     end
 
-    def opts_parser # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-      @opts_parser ||= OptionParser.new do |opts|
-        opts.banner = banner
-        opts.on('-f', '--formatter FORMATTER', %w[json tree],
-                'Format output using selected formatter (json tree)') do |formatter|
-
-          options[:formatter] = formatter
-        end
-
-        opts.on('-n', '--runs-num NUMBER', OptParse::DecimalInteger, 'Number of runs') do |runs|
-          fail OptionParser::InvalidArgument, 'must be a number greater than 0' if runs < 1
-
-          options[:runs] = runs
-        end
-
-        opts.on('-g', '--rubygems', 'Require rubygems before the actual analyze') do |rubygems|
-          options[:rubygems] = rubygems
-        end
-
-        opts.on('-d', '--debug', 'Show debug information') do |debug|
-          opts.banner += debug_banner if debug
-
-          options[:debug] = debug
-        end
-
-        opts.on_tail('-h', '--help', 'Show this message') do
-          puts opts
-          exit
-        end
-      end
-    end
-
-    def banner
-      script_name = "bundle exec #{File.basename($PROGRAM_NAME)}"
-
-      "GemFootprintAnalyzer (#{GemFootprintAnalyzer::VERSION})\n" \
-        "Usage: #{script_name} library_to_analyze [require]"
-    end
-
-    def debug_banner
-      "\n(#{File.expand_path(File.join(File.dirname(__FILE__), '..'))})"
-    end
-
-    def try_require_bundler
-      require 'bundler/setup'
-    rescue LoadError
-      nil
+    def analyze_gemfile?
+      options[:analyze_gemfile]
     end
   end
 end
