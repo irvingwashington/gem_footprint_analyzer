@@ -57,6 +57,8 @@ module GemFootprintAnalyzer
 
       attr_reader :options
 
+      private
+
       def banner
         script_name = "bundle exec #{File.basename($PROGRAM_NAME)}"
 

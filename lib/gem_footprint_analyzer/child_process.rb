@@ -7,6 +7,7 @@ module GemFootprintAnalyzer
     LEGACY_RUBY_CMD = [RbConfig.ruby, '--disable=gem'].freeze
     RUBY_CMD = [RbConfig.ruby, '--disable=did_you_mean', '--disable=gem'].freeze
 
+    # Sets necessary ivars
     def initialize(library, require_string, fifos, options = {})
       @library = library
       @require_string = require_string || library
@@ -15,6 +16,8 @@ module GemFootprintAnalyzer
       @options = options
     end
 
+    # Starts a child process in a child-watching-thread
+    # Reads it's PID from the new process' STDOUT and sets it as an instance variable
     def start_child
       @child_thread ||= Thread.new do # rubocop:disable Naming/MemoizedInstanceVariableName
         Open3.popen3(child_env_vars, *ruby_command, context_file) do |_, stdout, stderr|
@@ -27,6 +30,8 @@ module GemFootprintAnalyzer
       end
     end
 
+    # Blocking method
+    # @return [Integer|nil] Process id or nil, if the child-watching-thread is not started
     def pid
       return unless child_thread
 

@@ -9,6 +9,8 @@ module GemFootprintAnalyzer
     PARENT_FIFO = '/tmp/parent'.freeze
     CHILD_FIFO = '/tmp/child'.freeze
 
+    # Prints the process pid, so it can be grabbed by the supervisor process, inits tranport fifos
+    # and requires requested libraries.
     def initialize
       output Process.pid
       init_transport

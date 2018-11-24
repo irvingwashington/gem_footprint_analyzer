@@ -39,6 +39,5 @@ RSpec/MultipleExpectations:
 RSpec/MessageSpies:
   EnforcedStyle: receive
 
-# TODO: uncomment
-# Style/DocumentationMethod:
-#   Enabled: true
+Style/DocumentationMethod:
+  Enabled: true

@@ -4,6 +4,7 @@ module GemFootprintAnalyzer
   # A command line interface class for the gem.
   # Provides options parsing and help messages for the user.
   class CLI
+    # Sets default options, to be overwritten by option parser down the road
     def initialize
       @options = {}
       @options[:runs] = 10
