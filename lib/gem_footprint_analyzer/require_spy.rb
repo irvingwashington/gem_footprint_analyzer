@@ -102,9 +102,10 @@ module GemFootprintAnalyzer
         # we're redirecting :require_relative to the regular :require
         kernels.each do |k|
           k.send :define_method, :require_relative do |name|
+            return require(name) if name.start_with?('/')
+
             last_caller = caller(1..1).first
             relative_path = GemFootprintAnalyzer::RequireSpy.relative_path(last_caller, name)
-
             require(relative_path)
           end
         end
