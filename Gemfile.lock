@@ -15,7 +15,7 @@ GIT
 PATH
   remote: .
   specs:
-    gem_footprint_analyzer (0.1.7)
+    gem_footprint_analyzer (0.1.8)
 
 GEM
   remote: https://rubygems.org/
